@@ -4,17 +4,19 @@ const Bcrypt = require('./../helpers/authHelper');
 
 exports.registerController = async (req,res) => {
     try{
-        const {name,email,password,phone,address} = req.body;
+        const {name,email,password,phone,address,answer} = req.body;
         if(!name)
         return res.status(401).send({error:'Name is required'});
         if(!email)
-        return res.status(401).send({error:'Name is email'});
+        return res.status(401).send({error:'email is required'});
         if(!password)
-        return res.status(401).send({error:'Name is password'});
+        return res.status(401).send({error:'password is required'});
         if(!phone)
-        return res.status(401).send({error:'Name is phone'});
+        return res.status(401).send({error:'phone is required'});
         if(!address)
-        return res.status(401).send({error:'Name is address'});
+        return res.status(401).send({error:'address is required'});
+        if(!answer)
+        return res.status(401).send({error:'Answer is required'});
 
         const exisitingUser = await User.findOne({email});
 
@@ -30,7 +32,8 @@ exports.registerController = async (req,res) => {
             email,
             password:hashedPassword,
             phone,
-            address
+            address,
+            answer
         }).save();
 
         res.status(201).send({
@@ -89,4 +92,39 @@ exports.loginController = async(req,res) => {
 
 exports.testContoller = (req,res) => {
     console.log('protected router');
+}
+
+exports.forgotPasswordController = async (req,res) => {
+try{
+const {email,answer,newPassword} = req.body;
+if(!email)
+res.status(400).send({message:'Email is required'});
+
+if(!answer)
+res.status(400).send({message:'Answer is required'});
+
+if(!newPassword)
+res.status(400).send({message:'New password is required'});
+
+const user = await User.find({email,answer});
+
+if(!user)
+return res.status(404).send({
+    success:false,
+    message:'Worng Email or Answer'
+});
+ 
+const hashed = await Bcrypt.hashPassword(newPassword);
+await User.findByIdAndUpdate(user._id,{password:hashed});
+res.status(200).send({
+    success:true,
+    message:'password Reset successfully'
+});
+}catch(error){
+    res.status(500).send({
+        success:false,
+        message:'Something went worng',
+        error
+    });
+}
 }

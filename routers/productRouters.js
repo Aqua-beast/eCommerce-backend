@@ -31,4 +31,10 @@ router.get('/related-product/:pid/:cid',productController.relatedProductControll
 
 router.get('/product-category/:slug',productController.productCategorycontroller);
 
+router.get('/braintree/token',productController.braintreeTokenController);
+
+router.post('/braintree/payment',authMiddleware.requireSignIn,productController.brainTreePaymentController);
+
+router.get('/stripe/checkout-session/:pid',authMiddleware.requireSignIn,productController.getCheckoutSession);
+
 module.exports = router;

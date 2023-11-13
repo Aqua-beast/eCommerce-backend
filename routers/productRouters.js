@@ -25,4 +25,10 @@ authMiddleware.isAdmin,
 formidable(),
 productController.updateProductController);
 
+router.get('/search/:keyword',productController.searchController);
+
+router.get('/related-product/:pid/:cid',productController.relatedProductController);
+
+router.get('/product-category/:slug',productController.productCategorycontroller);
+
 module.exports = router;

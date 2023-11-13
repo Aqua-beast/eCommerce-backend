@@ -1,5 +1,6 @@
 const slugify = require('slugify');
 const Product = require('./../models/productModel');
+const Category = require('./../models/categoryModel');
 const fs = require('fs');
 
 exports.createProductController = async (req,res) => {
@@ -164,4 +165,65 @@ exports.updateProductController = async(req,res) => {
             message:'Error in updating product'
         })
         }
+}
+
+exports.searchController = async(req,res) => {
+    try{
+        const {keyword} = req.params;
+        const result = await Product.find({
+            $or:[
+                {name:{$regex:keyword,$options:'i'}},
+                {description:{$regex:keyword,$options:'i'}}
+            ]
+        }).select('-photo');
+        res.json(result);
+    }catch(error){
+        console.log(error);
+        res.status(400).send({
+            success:false,
+            message:'Error In search Product',
+            error
+        })
+    }
+}
+
+exports.relatedProductController = async(req,res) => {
+    try{
+        const {pid,cid} = req.params;
+        const products = await Product.find({
+            category:cid,
+            _id:{$ne:pid}
+        }).select('-photo').limit(3).populate('category');
+        res.status(200).send({
+            success:true,
+            message:'related products',
+            products
+        })
+
+    }catch(error){
+        console.log(error);
+        res.status(400).send({
+            success:false,
+            message:'error while getting related product'
+        })
+    }
+}
+
+exports.productCategorycontroller = async (req,res) => {
+    try{
+        const category = await Category.findOne({slug:req.params.slug});
+            const products = await Product.find({category}).populate('category');
+            res.status(200).send({
+                success:true,
+                category,
+                products
+            });
+    }catch(error){
+        console.log(error);
+        res.status(400).send({
+            success:false,
+            message:'Error while gettting product',
+            error
+        })
+    }
 }

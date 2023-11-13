@@ -20,7 +20,7 @@ try{
     res.status(200).send({
         success:true,
         message:'new category added',
-        cateerrorgory
+        category
     });
     
 }catch(error){

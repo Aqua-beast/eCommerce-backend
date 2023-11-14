@@ -3,6 +3,13 @@ const app = express();
 const authRouter = require('./routers/authRouter');
 const categoryRouters = require('./routers/categoryRouters');
 const productRouters = require('./routers/productRouters');
+const cors = require('cors');
+
+const corsOption = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+}
+app.use(cors(corsOption))
 
 app.use(express.json());
 app.use('/api/v1/auth',authRouter);
